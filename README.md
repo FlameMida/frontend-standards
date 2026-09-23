@@ -29,25 +29,33 @@ claude plugin update frontend-standards
 
 ## 其他编码 agent(Codex / Grok / pi / Cursor 等)
 
-本仓 4 个 skill 均为标准 `SKILL.md` 布局,各工具可直接消费:
+本仓 4 个 skill 均为标准 `SKILL.md` 布局,Codex 与 Grok 均以**原生 plugin 形态**安装:
 
-**一键软链(Codex + Grok + pi)**
+**Codex CLI**(自带 plugin 系统)
+
+```bash
+codex plugin marketplace add FlameMida/frontend-standards
+codex plugin add frontend-standards@flame-standards
+# 更新:codex plugin marketplace upgrade 后重跑 add
+```
+
+**Grok Build**(自带 plugin 系统;也会自动读取已装的 Claude Code 插件)
+
+```bash
+grok plugin install https://github.com/FlameMida/frontend-standards.git --trust
+# 更新:grok plugin update
+```
+
+> Grok 的 `plugin marketplace add` 对本仓 marketplace.json 的解析存在兼容问题(报 "No marketplace plugin named"),URL 直装方式已验证可用;待上游修复后可改用 marketplace 流程。
+
+**pi(pi.dev)**(软链方式)
 
 ```bash
 git clone https://github.com/FlameMida/frontend-standards ~/frontend-standards
-bash ~/frontend-standards/scripts/install-other-agents.sh          # 全部三家
-bash ~/frontend-standards/scripts/install-other-agents.sh codex pi # 只装指定工具
+bash ~/frontend-standards/scripts/install-other-agents.sh   # 默认装 pi
 ```
 
-软链共享:每日同步到 GitHub 后,`cd ~/frontend-standards && git pull` 一次,三个工具同时拿到最新。
-
-各工具的发现路径(脚本即按下表软链):
-
-| 工具 | 用户级 skill 目录 | 备注 |
-|---|---|---|
-| Codex CLI | `~/.codex/skills/` | 亦扫描项目内 `.agents/skills/` |
-| Grok Build | `~/.grok/skills/` | **已装 Claude Code 插件时零配置**(Grok 自动读 Claude 插件/skills,无需软链,避免重复发现) |
-| pi(pi.dev) | `~/.pi/agent/skills/` | 项目级 `.pi/skills/` 亦可 |
+软链共享:每日同步到 GitHub 后,`cd ~/frontend-standards && git pull` 一次即更新。
 
 **skills.sh 生态(Cursor / OpenCode / Droid / Amp 等 75+)**
 

@@ -1,7 +1,8 @@
 {
   "name": "flame-standards",
   "owner": {
-    "name": "FlameMida"
+    "name": "FlameMida",
+    "email": ""
   },
   "metadata": {
     "description": "FlameMida 自组装前端工程规范插件(官方上游每日同步)",
@@ -10,10 +11,17 @@
   "plugins": [
     {
       "name": "frontend-standards",
-      "source": "./",
       "description": "React 编码规范 + 组件组合模式 + Feature-Sliced Design 目录架构 + Turborepo monorepo 治理,4 skill 官方上游每日同步",
+      "source": "./",
       "category": "engineering",
-      "keywords": ["react", "composition", "fsd", "monorepo", "turborepo"]
+      "homepage": "https://github.com/FlameMida/frontend-standards",
+      "keywords": ["react", "composition", "fsd", "monorepo", "turborepo"],
+      "skills": [
+        "./skills/vercel-react-best-practices",
+        "./skills/vercel-composition-patterns",
+        "./skills/feature-sliced-design",
+        "./skills/turborepo"
+      ]
     }
   ]
 }

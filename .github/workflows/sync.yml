@@ -1,0 +1,42 @@
+name: sync-upstream
+
+on:
+  schedule:
+    - cron: '23 19 * * *' # 每日 UTC 19:23,避开整点
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync skills from upstreams
+        run: bash scripts/sync.sh
+
+      - name: Bump version, commit and push if changed
+        run: |
+          git config user.name "sync-bot"
+          git config user.email "actions@github.com"
+          if git diff --quiet; then
+            echo "无上游变更,跳过 commit"
+            exit 0
+          fi
+          python3 - <<'EOF'
+          import json
+          p = '.claude-plugin/plugin.json'
+          with open(p) as f:
+              d = json.load(f)
+          major, minor, patch = (int(x) for x in d['version'].split('.'))
+          d['version'] = f"{major}.{minor}.{patch + 1}"
+          with open(p, 'w') as f:
+              json.dump(d, f, indent=2, ensure_ascii=False)
+              f.write('\n')
+          EOF
+          SHAS="$(paste -sd' ' UPSTREAM.lock)"
+          git add -A
+          git commit -m "sync: ${SHAS}"
+          git push

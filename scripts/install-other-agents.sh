@@ -8,23 +8,26 @@
 #
 # 注意:Grok Build 会自动读取已安装的 Claude Code 插件(零配置兼容)。
 # 若你已通过 claude plugin install 安装本插件,可不装 grok 软链,避免同一 skill 被发现两次。
+# 兼容 macOS 自带 bash 3.2,不使用 associative array。
 set -euo pipefail
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
-declare -A TARGETS=(
-  [codex]="$HOME/.codex/skills"
-  [grok]="$HOME/.grok/skills"
-  [pi]="$HOME/.pi/agent/skills"
-)
+agent_dir() {
+  case "$1" in
+    codex) echo "$HOME/.codex/skills" ;;
+    grok)  echo "$HOME/.grok/skills" ;;
+    pi)    echo "$HOME/.pi/agent/skills" ;;
+    *)     return 1 ;;
+  esac
+}
 
-WANTED=("${@:-}")
-if [ ${#WANTED[@]} -eq 0 ]; then
-  WANTED=("${!TARGETS[@]}")
+if [ $# -eq 0 ]; then
+  set -- codex grok pi
 fi
 
-for agent in "${WANTED[@]}"; do
-  if [ -z "${TARGETS[$agent]+x}" ]; then
-    echo "!! 未知目标: $agent(可选:${!TARGETS[*]})" >&2
+for agent in "$@"; do
+  if ! agent_dir "$agent" >/dev/null 2>&1; then
+    echo "!! 未知目标: $agent(可选:codex grok pi)" >&2
     exit 1
   fi
 done
@@ -32,8 +35,8 @@ done
 for skill_dir in "$REPO_DIR"/skills/*/; do
   skill_dir="${skill_dir%/}"
   name="$(basename "$skill_dir")"
-  for agent in "${WANTED[@]}"; do
-    dst="${TARGETS[$agent]}"
+  for agent in "$@"; do
+    dst="$(agent_dir "$agent")"
     mkdir -p "$dst"
     if [ -e "$dst/$name" ] && [ ! -L "$dst/$name" ]; then
       echo "!! 跳过 $agent/$name:目标已存在且不是软链(请手动处理)"

@@ -1,6 +1,6 @@
 {
   "name": "frontend-standards",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "前端工程规范 skill 集:React 编码规范、组件组合模式、Feature-Sliced Design 目录架构、Turborepo monorepo 治理。内容每日自动同步自官方上游。",
   "author": {
     "name": "FlameMida"
